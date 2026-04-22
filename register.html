@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Almighty Junior Church</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <a href="index.html" class="logo">
+          Almighty<span>Junior</span>
+        </a>
+        <h2 style="font-size: 1.5rem; margin-top: 1rem;">Join the Family</h2>
+        <p style="color: var(--text-muted);">Create your member account.</p>
+      </div>
+
+      <div id="register-alert" class="alert"></div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email</label>
+          <input type="email" id="reg-email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-age">Age Group</label>
+          <select id="reg-age" class="form-control" required>
+            <option value="">Select Age Group</option>
+            <option value="child">Child (4-12)</option>
+            <option value="teen">Teen (13-17)</option>
+            <option value="adult">Adult / Leader</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Password</label>
+          <input type="password" id="reg-password" class="form-control" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Register</button>
+      </form>
+
+      <p style="text-align: center; color: var(--text-muted);">
+        Already have an account? <a href="login.html" style="color: var(--secondary); font-weight: 600;">Log in</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+      const ageGroup = document.getElementById('reg-age').value;
+      const password = document.getElementById('reg-password').value;
+      
+      const btn = e.target.querySelector('button');
+      const alert = document.getElementById('register-alert');
+
+      btn.disabled = true;
+      btn.textContent = 'Registering...';
+
+      firebaseAuth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          // Create user profile in Firestore
+          return firebaseDb.collection('users').doc(user.uid).set({
+            uid: user.uid,
+            name: name,
+            email: email,
+            role: 'member', // Default role
+            ageGroup: ageGroup,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          // auth.js will handle redirect based on role once doc is created
+          // but we can also force it:
+          window.location.href = 'dashboard.html';
+        })
+        .catch((error) => {
+          console.error("Registration error:", error);
+          alert.textContent = error.message;
+          alert.className = 'alert alert-error show';
+          btn.disabled = false;
+          btn.textContent = 'Register';
+        });
+    });
+  </script>
+</body>
+</html>

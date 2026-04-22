@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Almighty Junior Church</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    .admin-section { display: none; }
+    #tab-dashboard { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a href="index.html" class="logo">
+        Admin<span>Panel</span>
+      </a>
+      
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" onclick="showTab('tab-dashboard')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Overview
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-announcements')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Announcements
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-sermons')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+          Sermons
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-members')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Members
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-prayer')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Prayer Requests
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-contact')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Messages
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="logout()" class="btn btn-outline" style="width: 100%; color: white; border-color: rgba(255,255,255,0.3);">
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- DASHBOARD OVERVIEW -->
+      <div id="tab-dashboard" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Admin Dashboard</h1>
+            <p style="color: var(--text-muted);">Welcome back, <span id="admin-name">Admin</span>.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Quick Actions</h3>
+              <p class="card-text">Use the sidebar to navigate to specific sections to manage your church data.</p>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button onclick="showTab('tab-announcements'); toggleModal('modal-announcement');" class="btn btn-primary btn-sm">Add Event</button>
+                <button onclick="showTab('tab-sermons'); toggleModal('modal-sermon');" class="btn btn-outline btn-sm">Add Sermon</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div id="tab-announcements" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Announcements</h1>
+            <p style="color: var(--text-muted);">Manage upcoming events and news.</p>
+          </div>
+          <button onclick="toggleModal('modal-announcement')" class="btn btn-primary">Add New</button>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="announcements-tbody">
+              <tr><td colspan="3">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SERMONS -->
+      <div id="tab-sermons" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Sermons</h1>
+            <p style="color: var(--text-muted);">Manage sermon library.</p>
+          </div>
+          <button onclick="toggleModal('modal-sermon')" class="btn btn-primary">Add Sermon</button>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Has Video</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sermons-tbody">
+              <tr><td colspan="4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MEMBERS -->
+      <div id="tab-members" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Members</h1>
+            <p style="color: var(--text-muted);">View registered members and their attendance.</p>
+          </div>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Age Group</th>
+                <th>Attendance</th>
+              </tr>
+            </thead>
+            <tbody id="members-tbody">
+              <tr><td colspan="5">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRAYER REQUESTS -->
+      <div id="tab-prayer" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Prayer Requests</h1>
+            <p style="color: var(--text-muted);">Manage and pray for submitted requests.</p>
+          </div>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Request</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="prayer-tbody">
+              <tr><td colspan="4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONTACT MESSAGES -->
+      <div id="tab-contact" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Contact Messages</h1>
+            <p style="color: var(--text-muted);">Messages from the public site.</p>
+          </div>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="contact-tbody">
+              <tr><td colspan="4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- Add Announcement Modal -->
+  <div class="modal-backdrop" id="modal-announcement">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Announcement</h2>
+        <button class="btn-close" onclick="toggleModal('modal-announcement')">&times;</button>
+      </div>
+      <form id="form-add-announcement">
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" id="ann-title" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Event Date / Subtitle</label>
+          <input type="text" id="ann-date" class="form-control" required placeholder="e.g. Sunday, Oct 15 at 9:00 AM">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="ann-desc" class="form-control" required style="min-height: 100px;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Announcement</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Sermon Modal -->
+  <div class="modal-backdrop" id="modal-sermon">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Sermon</h2>
+        <button class="btn-close" onclick="toggleModal('modal-sermon')">&times;</button>
+      </div>
+      <form id="form-add-sermon">
+        <div class="form-group">
+          <label class="form-label">Sermon Title</label>
+          <input type="text" id="sermon-title" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date Preached</label>
+          <input type="date" id="sermon-date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">YouTube Link (Optional)</label>
+          <input type="url" id="sermon-yt" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Summary / Notes</label>
+          <textarea id="sermon-summary" class="form-control" required style="min-height: 100px;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Sermon</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Attendance Modal -->
+  <div class="modal-backdrop" id="modal-attendance">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Attendance: <span id="att-member-name"></span></h2>
+        <button class="btn-close" onclick="toggleModal('modal-attendance')">&times;</button>
+      </div>
+      <div class="table-wrapper" style="max-height: 300px; overflow-y: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Week Of</th>
+              <th>Marked At</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

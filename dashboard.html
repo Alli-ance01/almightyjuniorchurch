@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Almighty Junior Church</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a href="index.html" class="logo">
+        Almighty<span>Junior</span>
+      </a>
+      
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Dashboard
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Main Site
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="logout()" class="btn btn-outline" style="width: 100%; color: white; border-color: rgba(255,255,255,0.3);">
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Welcome, <span id="user-name">Loading...</span>!</h1>
+          <p style="color: var(--text-muted);">Here's your personal portal.</p>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+        
+        <!-- Attendance Card -->
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Weekly Attendance</h3>
+            <p class="card-text">Check in for this week's service to let us know you are here!</p>
+            
+            <div id="attendance-alert" class="alert"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+              <span style="font-weight: 500;" id="current-week">Week of ...</span>
+              <button id="check-in-btn" class="btn btn-primary btn-sm" onclick="markAttendance()">Check In</button>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+              <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Your Recent Attendance</h4>
+              <ul id="attendance-list" style="list-style: none;">
+                <li style="color: var(--text-muted); font-size: 0.875rem;">Loading...</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prayer Request Card -->
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Submit Prayer Request</h3>
+            <p class="card-text">How can we pray for you this week?</p>
+            
+            <div id="prayer-alert" class="alert"></div>
+            
+            <form id="dash-prayer-form">
+              <div class="form-group" style="margin-bottom: 1rem;">
+                <textarea id="dash-prayer-request" class="form-control" required placeholder="Type your prayer request here..." style="min-height: 80px;"></textarea>
+              </div>
+              <button type="submit" class="btn btn-outline btn-sm" style="width: 100%;">Submit Request</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let currentUser = null;
+    let currentUserData = null;
+
+    // Get the Monday of the current week to use as the week identifier
+    function getCurrentWeekString() {
+      const d = new Date();
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+      const monday = new Date(d.setDate(diff));
+      return monday.toISOString().split('T')[0]; // YYYY-MM-DD
+    }
+
+    const currentWeekStr = getCurrentWeekString();
+    document.getElementById('current-week').textContent = `Week of ${currentWeekStr}`;
+
+    window.addEventListener('authStateReady', (e) => {
+      const { user, userData } = e.detail;
+      if (user && userData) {
+        currentUser = user;
+        currentUserData = userData;
+        document.getElementById('user-name').textContent = userData.name.split(' ')[0];
+        
+        loadAttendance();
+      }
+    });
+
+    function loadAttendance() {
+      const list = document.getElementById('attendance-list');
+      const btn = document.getElementById('check-in-btn');
+      
+      firebaseDb.collection('attendance')
+        .where('userId', '==', currentUser.uid)
+        .orderBy('weekOf', 'desc')
+        .limit(5)
+        .onSnapshot(snapshot => {
+          if (snapshot.empty) {
+            list.innerHTML = '<li style="color: var(--text-muted); font-size: 0.875rem;">No attendance records yet.</li>';
+            btn.disabled = false;
+            btn.textContent = 'Check In';
+            return;
+          }
+
+          let html = '';
+          let checkedInThisWeek = false;
+
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.weekOf === currentWeekStr) {
+              checkedInThisWeek = true;
+            }
+            html += `<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.875rem;">
+              <span class="badge badge-success">Present</span> - Week of ${data.weekOf}
+            </li>`;
+          });
+
+          list.innerHTML = html;
+
+          if (checkedInThisWeek) {
+            btn.disabled = true;
+            btn.textContent = 'Checked In';
+            btn.className = 'btn btn-sm btn-outline';
+          } else {
+            btn.disabled = false;
+            btn.textContent = 'Check In';
+            btn.className = 'btn btn-sm btn-primary';
+          }
+        });
+    }
+
+    function markAttendance() {
+      if (!currentUser) return;
+      
+      const btn = document.getElementById('check-in-btn');
+      const alert = document.getElementById('attendance-alert');
+      btn.disabled = true;
+      btn.textContent = 'Checking in...';
+
+      // Check if already marked
+      firebaseDb.collection('attendance')
+        .where('userId', '==', currentUser.uid)
+        .where('weekOf', '==', currentWeekStr)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            alert.textContent = 'You are already checked in for this week.';
+            alert.className = 'alert alert-warning show';
+            return;
+          }
+
+          // Mark attendance
+          return firebaseDb.collection('attendance').add({
+            userId: currentUser.uid,
+            userName: currentUserData.name,
+            weekOf: currentWeekStr,
+            markedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          alert.textContent = 'Successfully checked in!';
+          alert.className = 'alert alert-success show';
+          setTimeout(() => { alert.className = 'alert'; }, 3000);
+        })
+        .catch(err => {
+          console.error(err);
+          alert.textContent = 'Error checking in.';
+          alert.className = 'alert alert-error show';
+          btn.disabled = false;
+          btn.textContent = 'Check In';
+        });
+    }
+
+    // Handle Dashboard Prayer Request
+    document.getElementById('dash-prayer-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if(!currentUserData) return;
+
+      const request = document.getElementById('dash-prayer-request').value;
+      const btn = e.target.querySelector('button');
+      const alert = document.getElementById('prayer-alert');
+
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      firebaseDb.collection('prayerRequests').add({
+        name: currentUserData.name, // Auto-fill name
+        request: request,
+        prayedFor: false,
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        e.target.reset();
+        alert.textContent = 'Prayer request submitted securely.';
+        alert.className = 'alert alert-success show';
+        setTimeout(() => { alert.className = 'alert'; }, 3000);
+      })
+      .catch((error) => {
+        console.error(error);
+        alert.textContent = 'Failed to submit request.';
+        alert.className = 'alert alert-error show';
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'Submit Request';
+      });
+    });
+  </script>
+</body>
+</html>

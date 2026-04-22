@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almighty Junior Church</title>
+  <meta name="description" content="Welcome to Almighty Junior Church - A youth and children ministry.">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Firebase Compat (v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        Almighty<span>Junior</span>
+      </a>
+      
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#events">Events</a>
+        <a href="#sermons">Sermons</a>
+        <a href="#prayer">Prayer</a>
+        <a href="#contact">Contact</a>
+      </div>
+
+      <div class="nav-auth" id="nav-auth-links">
+        <!-- Injected by auth.js -->
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
+      
+      <button class="mobile-menu-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header id="home" class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-tagline">Welcome to the Family</span>
+        <h1 class="hero-title">Empowering the Next Generation</h1>
+        <p class="hero-description">Join our vibrant community of youth and children growing in faith, love, and purpose. Experience dynamic worship, relatable teachings, and true fellowship.</p>
+        <div class="hero-actions">
+          <a href="#events" class="btn btn-primary">Upcoming Events</a>
+          <a href="#sermons" class="btn btn-outline" style="color: white; border-color: white;">Watch Latest</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Announcements / Events -->
+  <section id="events" class="section">
+    <div class="container">
+      <h2 class="section-title">Upcoming Events</h2>
+      <p class="section-subtitle">Don't miss out on what's happening at Almighty Junior Church.</p>
+      
+      <div id="events-grid" class="grid">
+        <!-- Populated by JS -->
+        <p style="text-align: center; width: 100%; grid-column: 1 / -1;">Loading events...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sermons & Devotionals -->
+  <section id="sermons" class="section" style="background-color: white;">
+    <div class="container">
+      <h2 class="section-title">Sermons & Devotionals</h2>
+      <p class="section-subtitle">Catch up on our latest teachings and spiritual nourishment.</p>
+      
+      <div id="sermons-grid" class="grid">
+        <!-- Populated by JS -->
+        <p style="text-align: center; width: 100%; grid-column: 1 / -1;">Loading sermons...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prayer Requests & Contact (Split Layout) -->
+  <section id="prayer" class="section">
+    <div class="container split-layout">
+      
+      <!-- Prayer Request Form -->
+      <div>
+        <h2 class="section-title" style="text-align: left;">Need Prayer?</h2>
+        <p style="margin-bottom: 2rem; color: var(--text-muted);">We believe in the power of prayer. Share your requests with us, and our team will be praying for you.</p>
+        
+        <div class="form-card" style="margin: 0;">
+          <div id="prayer-alert" class="alert"></div>
+          <form id="prayer-form">
+            <div class="form-group">
+              <label class="form-label" for="prayer-name">Your Name</label>
+              <input type="text" id="prayer-name" class="form-control" required placeholder="John Doe">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prayer-request">Prayer Request</label>
+              <textarea id="prayer-request" class="form-control" required placeholder="How can we pray for you?"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Request</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div id="contact">
+        <h2 class="section-title" style="text-align: left;">Get in Touch</h2>
+        <p style="margin-bottom: 2rem; color: var(--text-muted);">Have questions about our ministry? Send us a message and we'll get back to you soon.</p>
+        
+        <div class="form-card" style="margin: 0;">
+          <div id="contact-alert" class="alert"></div>
+          <form id="contact-form">
+            <div class="form-group">
+              <label class="form-label" for="contact-name">Your Name</label>
+              <input type="text" id="contact-name" class="form-control" required placeholder="Jane Doe">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="contact-email">Email Address</label>
+              <input type="email" id="contact-email" class="form-control" required placeholder="jane@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="contact-message">Message</label>
+              <textarea id="contact-message" class="form-control" required placeholder="Your message here..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-outline" style="width: 100%;">Send Message</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo" style="color: white; margin-bottom: 1rem;">
+            Almighty<span style="color: var(--secondary);">Junior</span>
+          </div>
+          <p style="color: #cbd5e1; max-width: 300px;">Raising a generation of dynamic believers equipped for the future.</p>
+        </div>
+        <div>
+          <h3 class="footer-title">Quick Links</h3>
+          <div class="footer-links">
+            <a href="#home">Home</a>
+            <a href="#events">Events</a>
+            <a href="#sermons">Sermons</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="footer-title">Connect</h3>
+          <div class="footer-links">
+            <a href="#prayer">Prayer Requests</a>
+            <a href="#contact">Contact Us</a>
+            <a href="login.html">Member Portal</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Almighty Junior Church. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

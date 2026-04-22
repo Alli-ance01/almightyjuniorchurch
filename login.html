@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Almighty Junior Church</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <a href="index.html" class="logo">
+          Almighty<span>Junior</span>
+        </a>
+        <h2 style="font-size: 1.5rem; margin-top: 1rem;">Welcome Back</h2>
+        <p style="color: var(--text-muted);">Log in to access your portal.</p>
+      </div>
+
+      <div id="login-alert" class="alert"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input type="email" id="login-email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Log In</button>
+      </form>
+
+      <p style="text-align: center; color: var(--text-muted);">
+        Don't have an account? <a href="register.html" style="color: var(--secondary); font-weight: 600;">Register here</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const btn = e.target.querySelector('button');
+      const alert = document.getElementById('login-alert');
+
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+
+      firebaseAuth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // auth.js will handle the redirect based on role
+        })
+        .catch((error) => {
+          console.error("Login error:", error);
+          alert.textContent = 'Invalid email or password.';
+          alert.className = 'alert alert-error show';
+          btn.disabled = false;
+          btn.textContent = 'Log In';
+        });
+    });
+  </script>
+</body>
+</html>
