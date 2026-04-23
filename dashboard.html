@@ -9,6 +9,10 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    .dashboard-section { display: none; }
+    #tab-home { display: block; }
+  </style>
 </head>
 <body>
 
@@ -21,9 +25,17 @@
       </a>
       
       <nav class="sidebar-nav">
-        <a href="dashboard.html" class="sidebar-link active">
+        <a href="#" class="sidebar-link active" onclick="showTab('tab-home')">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          Dashboard
+          Overview
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-teams')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Serving Teams
+        </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-settings')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Settings
         </a>
         <a href="index.html" class="sidebar-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -40,54 +52,123 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Welcome, <span id="user-name">Loading...</span>!</h1>
-          <p style="color: var(--text-muted);">Here's your personal portal.</p>
+      <!-- HOME TAB -->
+      <div id="tab-home" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Welcome, <span id="user-name">Loading...</span>!</h1>
+            <p style="color: var(--text-muted);">Here's your personal portal.</p>
+          </div>
+          <button id="theme-toggle" class="btn btn-outline btn-sm" title="Toggle Dark Mode">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+        </div>
+
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+          
+          <!-- Attendance Card -->
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Weekly Attendance</h3>
+              <p class="card-text">Check in for this week's service to let us know you are here!</p>
+              
+              <div id="attendance-alert" class="alert"></div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                <span style="font-weight: 500;" id="current-week">Week of ...</span>
+                <button id="check-in-btn" class="btn btn-primary btn-sm" onclick="markAttendance()">Check In</button>
+              </div>
+              
+              <div style="margin-top: 1.5rem;">
+                <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Your Recent Attendance</h4>
+                <ul id="attendance-list" style="list-style: none;">
+                  <li style="color: var(--text-muted); font-size: 0.875rem;">Loading...</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prayer Request Card -->
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Submit Prayer Request</h3>
+              <p class="card-text">How can we pray for you this week?</p>
+              
+              <div id="prayer-alert" class="alert"></div>
+              
+              <form id="dash-prayer-form">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <textarea id="dash-prayer-request" class="form-control" required placeholder="Type your prayer request here..." style="min-height: 80px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline btn-sm" style="width: 100%;">Submit Request</button>
+              </form>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+      <!-- TEAMS TAB -->
+      <div id="tab-teams" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Serving Teams</h1>
+            <p style="color: var(--text-muted);">Join a team and serve the community.</p>
+          </div>
+        </div>
         
-        <!-- Attendance Card -->
-        <div class="card">
-          <div class="card-body">
-            <h3 class="card-title">Weekly Attendance</h3>
-            <p class="card-text">Check in for this week's service to let us know you are here!</p>
-            
-            <div id="attendance-alert" class="alert"></div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-              <span style="font-weight: 500;" id="current-week">Week of ...</span>
-              <button id="check-in-btn" class="btn btn-primary btn-sm" onclick="markAttendance()">Check In</button>
+        <div class="grid">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Media Team</h3>
+              <p class="card-text">Help with cameras, sound, and visual presentation during services.</p>
+              <div id="team-btn-Media"></div>
             </div>
-            
-            <div style="margin-top: 1.5rem;">
-              <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Your Recent Attendance</h4>
-              <ul id="attendance-list" style="list-style: none;">
-                <li style="color: var(--text-muted); font-size: 0.875rem;">Loading...</li>
-              </ul>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Worship Team</h3>
+              <p class="card-text">Sing or play instruments during our worship sessions.</p>
+              <div id="team-btn-Worship"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Ushering Team</h3>
+              <p class="card-text">Welcome members, guide seating, and ensure a smooth service experience.</p>
+              <div id="team-btn-Ushering"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Prayer Request Card -->
-        <div class="card">
-          <div class="card-body">
-            <h3 class="card-title">Submit Prayer Request</h3>
-            <p class="card-text">How can we pray for you this week?</p>
-            
-            <div id="prayer-alert" class="alert"></div>
-            
-            <form id="dash-prayer-form">
-              <div class="form-group" style="margin-bottom: 1rem;">
-                <textarea id="dash-prayer-request" class="form-control" required placeholder="Type your prayer request here..." style="min-height: 80px;"></textarea>
-              </div>
-              <button type="submit" class="btn btn-outline btn-sm" style="width: 100%;">Submit Request</button>
-            </form>
+      <!-- SETTINGS TAB -->
+      <div id="tab-settings" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Profile Settings</h1>
+            <p style="color: var(--text-muted);">Update your personal details.</p>
           </div>
         </div>
-
+        
+        <div class="form-card" style="margin: 0; max-width: 600px;">
+          <div id="profile-alert" class="alert"></div>
+          <form id="profile-form">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="prof-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address (Read Only)</label>
+              <input type="email" id="prof-email" class="form-control" readonly disabled>
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password (leave blank to keep current)</label>
+              <input type="password" id="prof-password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
       </div>
     </main>
 
@@ -118,7 +199,12 @@
         currentUserData = userData;
         document.getElementById('user-name').textContent = userData.name.split(' ')[0];
         
+        // Populate profile form
+        document.getElementById('prof-name').value = userData.name;
+        document.getElementById('prof-email').value = userData.email;
+
         loadAttendance();
+        loadTeams();
       }
     });
 
@@ -240,6 +326,114 @@
         btn.disabled = false;
         btn.textContent = 'Submit Request';
       });
+    });
+
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+      if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+      }
+      
+      themeToggle.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dark') {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
+
+    // Tab Navigation
+    function showTab(tabId) {
+      document.querySelectorAll('.dashboard-section').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).style.display = 'block';
+      const link = document.querySelector(`[onclick="showTab('${tabId}')"]`);
+      if(link) link.classList.add('active');
+    }
+
+    // Teams Logic
+    function loadTeams() {
+      const teams = ['Media', 'Worship', 'Ushering'];
+      teams.forEach(team => {
+        const btnContainer = document.getElementById(`team-btn-${team}`);
+        firebaseDb.collection('teamRosters')
+          .where('teamName', '==', team)
+          .where('userId', '==', currentUser.uid)
+          .onSnapshot(snapshot => {
+            if (snapshot.empty) {
+              btnContainer.innerHTML = `<button onclick="joinTeam('${team}')" class="btn btn-sm btn-primary">Join Team</button>`;
+            } else {
+              const docId = snapshot.docs[0].id;
+              btnContainer.innerHTML = `<button onclick="leaveTeam('${docId}')" class="btn btn-sm btn-outline" style="color:red; border-color:red;">Leave Team</button>`;
+            }
+          });
+      });
+    }
+
+    window.joinTeam = function(teamName) {
+      firebaseDb.collection('teamRosters').add({
+        teamName: teamName,
+        userId: currentUser.uid,
+        userName: currentUserData.name,
+        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    };
+
+    window.leaveTeam = function(docId) {
+      if(confirm('Are you sure you want to leave this team?')) {
+        firebaseDb.collection('teamRosters').doc(docId).delete();
+      }
+    };
+
+    // Profile Settings Logic
+    document.getElementById('profile-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newName = document.getElementById('prof-name').value;
+      const newPass = document.getElementById('prof-password').value;
+      const btn = e.target.querySelector('button');
+      const alert = document.getElementById('profile-alert');
+      
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      let promises = [];
+
+      // Update Firestore name
+      if (newName !== currentUserData.name) {
+        promises.push(
+          firebaseDb.collection('users').doc(currentUser.uid).update({ name: newName })
+        );
+      }
+
+      // Update Auth Password
+      if (newPass && newPass.trim() !== '') {
+        promises.push(
+          currentUser.updatePassword(newPass)
+        );
+      }
+
+      Promise.all(promises)
+        .then(() => {
+          alert.textContent = 'Profile updated successfully!';
+          alert.className = 'alert alert-success show';
+          document.getElementById('prof-password').value = ''; // clear password field
+          setTimeout(() => { alert.className = 'alert'; }, 3000);
+        })
+        .catch(err => {
+          console.error(err);
+          alert.textContent = 'Error updating profile: ' + err.message;
+          alert.className = 'alert alert-error show';
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.textContent = 'Save Changes';
+        });
     });
   </script>
 </body>

@@ -14,6 +14,7 @@ window.addEventListener('authStateReady', (e) => {
     loadMembers();
     loadPrayerRequests();
     loadContactMessages();
+    loadTeams();
   }
 });
 
@@ -56,6 +57,9 @@ function loadAnnouncements() {
         <tr>
           <td>${data.title}</td>
           <td>${data.date}</td>
+          <td>
+            <button onclick="viewRSVPs('${doc.id}', '${data.title.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline">View</button>
+          </td>
           <td>
             <button onclick="deleteDoc('announcements', '${doc.id}')" class="btn btn-sm btn-outline" style="color: red; border-color: red;">Delete</button>
           </td>
@@ -115,12 +119,14 @@ function handleAddSermon(e) {
   const date = document.getElementById('sermon-date').value;
   const yt = document.getElementById('sermon-yt').value;
   const summary = document.getElementById('sermon-summary').value;
+  const notes = document.getElementById('sermon-notes').value;
   
   firebaseDb.collection('sermons').add({
     title: title,
     date: date,
     youtubeLink: yt,
     summary: summary,
+    notes: notes,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
     e.target.reset();
@@ -256,8 +262,99 @@ function deleteDoc(collection, id) {
   }
 }
 
-// Setup form listeners
+// Setup form listeners and theme
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('form-add-announcement').addEventListener('submit', handleAddAnnouncement);
   document.getElementById('form-add-sermon').addEventListener('submit', handleAddSermon);
+
+  // Theme Toggle Logic
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+    if (currentTheme) {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      let theme = document.documentElement.getAttribute('data-theme');
+      if (theme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  }
 });
+
+// ==========================================
+// NEW EXPANSION FEATURES (TEAMS & RSVPS)
+// ==========================================
+
+function loadTeams() {
+  const teams = ['Media', 'Worship', 'Ushering'];
+  teams.forEach(team => {
+    const rosterList = document.getElementById(`roster-${team}`);
+    if (!rosterList) return;
+    
+    firebaseDb.collection('teamRosters')
+      .where('teamName', '==', team)
+      .orderBy('joinedAt', 'asc')
+      .onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          rosterList.innerHTML = '<li style="color: var(--text-muted); font-size: 0.875rem;">No members in this team yet.</li>';
+          return;
+        }
+        
+        let html = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const joined = data.joinedAt ? data.joinedAt.toDate().toLocaleDateString() : 'N/A';
+          html += `<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+            <strong>${data.userName}</strong> <span style="color: var(--text-muted); font-size: 0.875rem;">(Joined: ${joined})</span>
+          </li>`;
+        });
+        rosterList.innerHTML = html;
+      });
+  });
+}
+
+function viewRSVPs(eventId, eventTitle) {
+  const tbody = document.getElementById('rsvps-tbody');
+  document.getElementById('rsvp-event-name').textContent = eventTitle;
+  
+  firebaseDb.collection('eventRSVPs')
+    .where('eventId', '==', eventId)
+    .orderBy('rsvpdAt', 'desc')
+    .get()
+    .then(snapshot => {
+      let html = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const markedDate = data.rsvpdAt ? data.rsvpdAt.toDate().toLocaleString() : 'N/A';
+        html += `
+          <tr>
+            <td>${data.userName}</td>
+            <td>${markedDate}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html || '<tr><td colspan="2">No RSVPs yet.</td></tr>';
+      toggleModal('modal-rsvps');
+    })
+    .catch(err => {
+      console.error("RSVP loading error", err);
+      // Fallback if index missing
+      firebaseDb.collection('eventRSVPs').where('eventId', '==', eventId).get().then(snap => {
+         let html = '';
+         snap.forEach(doc => {
+           const data = doc.data();
+           const markedDate = data.rsvpdAt ? data.rsvpdAt.toDate().toLocaleString() : 'N/A';
+           html += `<tr><td>${data.userName}</td><td>${markedDate}</td></tr>`;
+         });
+         tbody.innerHTML = html || '<tr><td colspan="2">No RSVPs yet.</td></tr>';
+         toggleModal('modal-rsvps');
+      });
+    });
+}

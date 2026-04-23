@@ -38,6 +38,10 @@
         <a href="register.html" class="btn btn-primary btn-sm">Register</a>
       </div>
       
+      <button id="theme-toggle" class="btn btn-outline btn-sm" style="border: none; padding: 0.5rem; margin-left: 0.5rem;" title="Toggle Dark Mode">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      
       <button class="mobile-menu-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
@@ -60,7 +64,7 @@
   </header>
 
   <!-- Announcements / Events -->
-  <section id="events" class="section">
+  <section id="events" class="section animate-on-scroll">
     <div class="container">
       <h2 class="section-title">Upcoming Events</h2>
       <p class="section-subtitle">Don't miss out on what's happening at Almighty Junior Church.</p>
@@ -73,7 +77,7 @@
   </section>
 
   <!-- Sermons & Devotionals -->
-  <section id="sermons" class="section" style="background-color: white;">
+  <section id="sermons" class="section animate-on-scroll" style="background-color: var(--surface);">
     <div class="container">
       <h2 class="section-title">Sermons & Devotionals</h2>
       <p class="section-subtitle">Catch up on our latest teachings and spiritual nourishment.</p>
@@ -86,7 +90,7 @@
   </section>
 
   <!-- Prayer Requests & Contact (Split Layout) -->
-  <section id="prayer" class="section">
+  <section id="prayer" class="section animate-on-scroll">
     <div class="container split-layout">
       
       <!-- Prayer Request Form -->
@@ -170,6 +174,19 @@
       </div>
     </div>
   </footer>
+
+  <!-- Sermon Notes Modal -->
+  <div class="modal-backdrop" id="modal-sermon-notes">
+    <div class="modal" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="sermon-notes-title">Sermon Notes</h2>
+        <button class="btn-close" onclick="document.getElementById('modal-sermon-notes').classList.remove('active')">&times;</button>
+      </div>
+      <div id="sermon-notes-content" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-main);">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="js/firebase-config.js"></script>

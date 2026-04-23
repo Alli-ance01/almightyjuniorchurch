@@ -41,6 +41,10 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           Members
         </a>
+        <a href="#" class="sidebar-link" onclick="showTab('tab-teams')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Teams
+        </a>
         <a href="#" class="sidebar-link" onclick="showTab('tab-prayer')">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
           Prayer Requests
@@ -68,6 +72,9 @@
             <h1 class="page-title">Admin Dashboard</h1>
             <p style="color: var(--text-muted);">Welcome back, <span id="admin-name">Admin</span>.</p>
           </div>
+          <button id="theme-toggle" class="btn btn-outline btn-sm" title="Toggle Dark Mode">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
         </div>
         <div class="grid">
           <div class="card">
@@ -99,11 +106,12 @@
               <tr>
                 <th>Title</th>
                 <th>Date</th>
+                <th>RSVPs</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="announcements-tbody">
-              <tr><td colspan="3">Loading...</td></tr>
+              <tr><td colspan="4">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -160,6 +168,37 @@
               <tr><td colspan="5">Loading...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- TEAMS -->
+      <div id="tab-teams" class="admin-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Serving Teams</h1>
+            <p style="color: var(--text-muted);">View rosters for volunteer teams.</p>
+          </div>
+        </div>
+        
+        <div class="grid">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Media Team</h3>
+              <ul id="roster-Media" style="list-style:none; margin-top:1rem;"></ul>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Worship Team</h3>
+              <ul id="roster-Worship" style="list-style:none; margin-top:1rem;"></ul>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">Ushering Team</h3>
+              <ul id="roster-Ushering" style="list-style:none; margin-top:1rem;"></ul>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -266,8 +305,12 @@
           <input type="url" id="sermon-yt" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
         </div>
         <div class="form-group">
-          <label class="form-label">Summary / Notes</label>
-          <textarea id="sermon-summary" class="form-control" required style="min-height: 100px;"></textarea>
+          <label class="form-label">Summary</label>
+          <input type="text" id="sermon-summary" class="form-control" required placeholder="Short summary for the card">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Detailed Notes / Study Guide (Optional)</label>
+          <textarea id="sermon-notes" class="form-control" style="min-height: 150px;" placeholder="Full text of the sermon or study guide..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Save Sermon</button>
       </form>
@@ -290,6 +333,29 @@
             </tr>
           </thead>
           <tbody id="attendance-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- View RSVPs Modal -->
+  <div class="modal-backdrop" id="modal-rsvps">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">RSVPs: <span id="rsvp-event-name"></span></h2>
+        <button class="btn-close" onclick="toggleModal('modal-rsvps')">&times;</button>
+      </div>
+      <div class="table-wrapper" style="max-height: 300px; overflow-y: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>RSVP'd At</th>
+            </tr>
+          </thead>
+          <tbody id="rsvps-tbody">
             <!-- Populated by JS -->
           </tbody>
         </table>

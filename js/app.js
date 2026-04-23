@@ -15,6 +15,39 @@ document.addEventListener('DOMContentLoaded', () => {
   if (contactForm) {
     contactForm.addEventListener('submit', handleContactSubmit);
   }
+
+  // Theme Toggle Logic
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+    if (currentTheme) {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      let theme = document.documentElement.getAttribute('data-theme');
+      if (theme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  }
+
+  // Scroll Animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+    observer.observe(el);
+  });
 });
 
 // Load Announcements/Events
@@ -32,12 +65,18 @@ function loadEvents() {
       let html = '';
       snapshot.forEach(doc => {
         const data = doc.data();
+        // RSVP Logic
+        let rsvpBtn = '';
+        // If user is logged in (auth state is handled globally, we can check if window.currentUser exists or provide a generic "Please login to RSVP" click)
+        rsvpBtn = `<button onclick="handleRSVP('${doc.id}', '${data.title.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline" style="margin-top: 1rem; width: 100%;">RSVP</button>`;
+
         html += `
           <div class="card">
             <div class="card-body">
               <div class="card-meta">${data.date}</div>
               <h3 class="card-title">${data.title}</h3>
               <p class="card-text">${data.description}</p>
+              ${rsvpBtn}
             </div>
           </div>
         `;
@@ -82,6 +121,15 @@ function loadSermons() {
           }
         }
 
+        // Sermon Notes
+        let notesBtn = '';
+        if (data.notes && data.notes.trim() !== '') {
+          // Escape quotes for HTML attribute
+          const escapedNotes = encodeURIComponent(data.notes);
+          const escapedTitle = encodeURIComponent(data.title);
+          notesBtn = `<button onclick="openSermonNotes('${escapedTitle}', '${escapedNotes}')" class="btn btn-sm btn-outline" style="margin-top: 1rem; width: 100%;">Read Notes</button>`;
+        }
+
         html += `
           <div class="card">
             <div class="card-body">
@@ -89,6 +137,7 @@ function loadSermons() {
               <div class="card-meta">${data.date}</div>
               <h3 class="card-title">${data.title}</h3>
               <p class="card-text">${data.summary}</p>
+              ${notesBtn}
             </div>
           </div>
         `;
@@ -174,3 +223,44 @@ function showAlert(element, message, type) {
     element.className = 'alert';
   }, 5000);
 }
+
+// Handle RSVP Click
+window.handleRSVP = function(eventId, eventTitle) {
+  // Check if logged in
+  const user = firebaseAuth.currentUser;
+  if (!user) {
+    alert("Please log in or register to RSVP for events!");
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Get user profile to get the name
+  firebaseDb.collection('users').doc(user.uid).get().then(doc => {
+    if (doc.exists) {
+      const userData = doc.data();
+      // Record RSVP
+      firebaseDb.collection('eventRSVPs').add({
+        eventId: eventId,
+        eventTitle: eventTitle,
+        userId: user.uid,
+        userName: userData.name,
+        rsvpdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("Successfully RSVP'd to " + eventTitle + "!");
+      }).catch(err => {
+        console.error("RSVP error:", err);
+        alert("Failed to RSVP. Please try again.");
+      });
+    }
+  });
+};
+
+// Open Sermon Notes Modal
+window.openSermonNotes = function(encodedTitle, encodedNotes) {
+  const title = decodeURIComponent(encodedTitle);
+  const notes = decodeURIComponent(encodedNotes);
+  
+  document.getElementById('sermon-notes-title').textContent = title + " - Notes";
+  document.getElementById('sermon-notes-content').textContent = notes;
+  document.getElementById('modal-sermon-notes').classList.add('active');
+};

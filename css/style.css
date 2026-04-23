@@ -28,6 +28,29 @@
   --radius-full: 9999px;
 }
 
+[data-theme="dark"] {
+  --primary: #c7d2fe; /* Lighter indigo for text contrast */
+  --primary-light: #a5b4fc;
+  --background: #0f172a; /* Dark slate */
+  --surface: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+}
+
+/* Base elements smooth transition */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.card, .form-control, .form-card, .table-wrapper, .modal, .navbar {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -68,6 +91,10 @@ ul {
   color: var(--primary);
   margin-bottom: 1rem;
   text-align: center;
+}
+
+[data-theme="dark"] .section-title {
+  color: var(--text-main);
 }
 
 .section-subtitle {
@@ -130,7 +157,10 @@ ul {
   top: 0;
   z-index: 1000;
   box-shadow: var(--shadow-sm);
-  transition: var(--transition);
+}
+
+[data-theme="dark"] .navbar {
+  background-color: rgba(30, 41, 59, 0.95);
 }
 
 .nav-container {
@@ -147,6 +177,10 @@ ul {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+[data-theme="dark"] .logo {
+  color: var(--text-main);
 }
 
 .logo span {
@@ -286,6 +320,10 @@ ul {
   font-weight: 700;
   margin-bottom: 0.75rem;
   color: var(--primary);
+}
+
+[data-theme="dark"] .card-title {
+  color: var(--text-main);
 }
 
 .card-text {
@@ -509,6 +547,22 @@ textarea.form-control {
     transform: translateY(0);
   }
 }
+
+/* Scroll Animations */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.animate-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
 
 /* Modal */
 .modal-backdrop {
